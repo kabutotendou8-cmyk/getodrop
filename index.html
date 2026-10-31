@@ -1,0 +1,892 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
+<title>GETO DROP — Upload File 200MB, Link Otomatis 12 Jam</title>
+<meta name="description" content="Upload file sampai 200MB, langsung dapat link share. Otomatis terhapus 12 jam. Tanpa login, tanpa iklan, gratis.">
+<meta name="theme-color" content="#0b0614">
+<meta property="og:title" content="GETO DROP — Temporary File Host">
+<meta property="og:description" content="Drop file-nya, link-nya langsung jadi. Max 200MB · auto hapus 12 jam · no login.">
+<link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><text y='.9em' font-size='90'>📦</text></svg>">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;500;600;700;800&family=Titan+One&family=Caveat:wght@600;700&display=swap" rel="stylesheet">
+<style>
+/* ============================================================
+   GETO DROP — gaya keluarga Geto (Prem · Store · TDL)
+   Palet: ungu hitam ala cursed energy (JJK) + glow ungu
+   ============================================================ */
+:root{
+  --bg:#0b0614; --bg2:#150b26;
+  --card:rgba(139,92,246,.075); --card2:rgba(139,92,246,.13);
+  --line:rgba(167,139,250,.24); --line2:rgba(167,139,250,.45);
+  --acc:#a78bfa; --acc2:#c084fc; --acc3:#e879f9; --pink:#f0abfc;
+  --gold:#fbbf24; --txt:#f3eefc; --mut:#bcaada; --ok:#34d399; --err:#f87171;
+  --r:18px;
+  --shadow:0 10px 34px rgba(0,0,0,.45);
+  --glow:0 0 22px rgba(167,139,250,.35);
+}
+*{margin:0;padding:0;box-sizing:border-box;-webkit-tap-highlight-color:transparent}
+html{scroll-behavior:smooth}
+body{
+  background:var(--bg);color:var(--txt);
+  font-family:'Poppins',sans-serif;font-size:14.5px;line-height:1.65;
+  min-height:100vh;overflow-x:hidden;
+  background-image:radial-gradient(1100px 500px at 50% -80px,rgba(139,92,246,.16),transparent 70%);
+}
+::selection{background:rgba(232,121,249,.35)}
+img,svg{display:block}
+a{color:var(--acc);text-decoration:none}
+button{font-family:inherit;color:inherit;background:none;border:0;cursor:pointer}
+input{font-family:inherit}
+
+/* ---------- splash ---------- */
+#splash{position:fixed;inset:0;z-index:90;display:grid;place-content:center;justify-items:center;gap:10px;
+  background:linear-gradient(160deg,var(--bg),var(--bg2) 60%,#1d0f36);transition:opacity .5s,visibility .5s}
+#splash.off{opacity:0;visibility:hidden;pointer-events:none}
+.slogo{font-family:'Titan One',cursive;font-size:36px;letter-spacing:1.5px;
+  background:linear-gradient(92deg,#d8caff,#f0abfc);-webkit-background-clip:text;background-clip:text;color:transparent;
+  filter:drop-shadow(0 0 18px rgba(167,139,250,.5))}
+.ssub{font-family:'Caveat',cursive;font-size:19px;color:var(--mut)}
+.sbar{width:150px;height:4px;border-radius:99px;background:rgba(167,139,250,.18);overflow:hidden}
+.sbar i{display:block;height:100%;width:38%;border-radius:99px;
+  background:linear-gradient(90deg,var(--acc),var(--acc3));animation:sl 1s ease-in-out infinite}
+@keyframes sl{0%{transform:translateX(-110%)}100%{transform:translateX(290%)}}
+
+/* ---------- background ---------- */
+.blob{position:fixed;border-radius:50%;filter:blur(70px);opacity:.5;z-index:0;pointer-events:none;
+  animation:fl 12s ease-in-out infinite alternate}
+.b1{width:280px;height:280px;top:-60px;left:-70px;background:rgba(139,92,246,.32)}
+.b2{width:230px;height:230px;bottom:-40px;right:-50px;background:rgba(217,70,239,.22);animation-delay:-4s}
+.b3{width:170px;height:170px;top:42%;right:-60px;background:rgba(96,165,250,.16);animation-delay:-8s}
+@keyframes fl{from{transform:translateY(0) scale(1)}to{transform:translateY(26px) scale(1.08)}}
+.grid-bg{position:fixed;inset:0;z-index:0;pointer-events:none;opacity:.5;
+  background:linear-gradient(rgba(167,139,250,.05) 1px,transparent 1px),linear-gradient(90deg,rgba(167,139,250,.05) 1px,transparent 1px);
+  background-size:34px 34px;
+  -webkit-mask-image:radial-gradient(70% 55% at 50% 30%,#000 30%,transparent 100%);
+  mask-image:radial-gradient(70% 55% at 50% 30%,#000 30%,transparent 100%)}
+#fx{position:fixed;inset:0;z-index:0;pointer-events:none}
+
+/* ---------- header pill ---------- */
+.hdr{position:sticky;top:10px;z-index:50;padding:0 14px}
+.hdr-in{max-width:560px;margin:auto;display:flex;align-items:center;gap:10px;
+  background:rgba(21,12,38,.82);backdrop-filter:blur(14px);-webkit-backdrop-filter:blur(14px);
+  border:1px solid var(--line);border-radius:999px;padding:9px 16px;box-shadow:var(--shadow)}
+.logo{display:flex;align-items:center;gap:8px;font-family:'Titan One',cursive;font-size:16.5px;letter-spacing:.8px;
+  background:linear-gradient(92deg,#d8caff,#f0abfc);-webkit-background-clip:text;background-clip:text;color:transparent}
+.status{display:flex;align-items:center;gap:6px;font-size:10.5px;font-weight:700;letter-spacing:1.5px;color:var(--ok);
+  border:1px solid rgba(52,211,153,.35);background:rgba(52,211,153,.09);border-radius:999px;padding:4px 11px}
+.status .dot{width:7px;height:7px;border-radius:50%;background:var(--ok);box-shadow:0 0 9px var(--ok);animation:pulse 1.8s infinite}
+@keyframes pulse{50%{opacity:.45}}
+.spacer{flex:1}
+.wa-top{display:flex;align-items:center;gap:7px;font-size:12.5px;font-weight:700;color:#fff;
+  background:linear-gradient(92deg,#8b5cf6,#d946ef);border-radius:999px;padding:8px 15px;box-shadow:0 4px 16px rgba(139,92,246,.4)}
+.wa-top:active{transform:scale(.96)}
+
+/* ---------- layout ---------- */
+.wrap{position:relative;z-index:5;max-width:560px;margin:0 auto;padding:0 16px}
+main{padding:20px 0 96px}
+section{margin-top:34px;scroll-margin-top:76px}
+
+/* ---------- hero ---------- */
+.hero{display:flex;flex-direction:column;align-items:center;text-align:center;padding-top:14px}
+.avatar{position:relative;width:104px;height:104px;margin-bottom:14px}
+.ring{position:absolute;inset:-4px;border-radius:50%;
+  background:conic-gradient(var(--acc2),var(--acc3),#8b5cf6,var(--acc2));
+  animation:spin 5.5s linear infinite;filter:drop-shadow(0 0 12px rgba(192,132,252,.5))}
+@keyframes spin{to{transform:rotate(360deg)}}
+.sil{position:absolute;inset:0;border-radius:50%;overflow:hidden;background:#150a26}
+.sil img{width:100%;height:100%;object-fit:cover}
+.crown-f{position:absolute;top:-24px;left:50%;transform:translateX(-50%);z-index:2;animation:bob 2.4s ease-in-out infinite}
+@keyframes bob{50%{transform:translateX(-50%) translateY(-5px)}}
+.dot-on{position:absolute;right:6px;bottom:8px;width:15px;height:15px;border-radius:50%;
+  background:var(--ok);border:3px solid var(--bg);box-shadow:0 0 10px var(--ok)}
+.hero h1{font-family:'Titan One',cursive;font-size:34px;letter-spacing:1.2px;line-height:1.15;
+  background:linear-gradient(92deg,#d8caff,#f0abfc 60%,#e879f9);-webkit-background-clip:text;background-clip:text;color:transparent}
+.tag{color:var(--mut);font-size:13.5px;margin-top:2px}
+.chips{display:flex;flex-wrap:wrap;justify-content:center;gap:8px;margin-top:13px}
+.chip{font-size:10.5px;font-weight:700;letter-spacing:1.2px;color:#d8caff;
+  border:1px solid var(--line);background:var(--card);border-radius:999px;padding:6px 13px}
+.chip b{color:var(--acc3)}
+.slogan{font-family:'Caveat',cursive;font-size:22.5px;color:#cdbcf0;margin-top:13px}
+.slogan span{color:var(--pink)}
+
+/* ---------- tombol ---------- */
+.cta{display:flex;flex-wrap:wrap;justify-content:center;gap:10px;margin-top:17px}
+.btn{display:inline-flex;align-items:center;justify-content:center;gap:8px;font-size:13.5px;font-weight:700;
+  border-radius:999px;padding:12px 21px;transition:transform .15s,box-shadow .15s}
+.btn:active{transform:scale(.96)}
+.btn-pri{color:#fff;background:linear-gradient(92deg,#8b5cf6,#d946ef);box-shadow:0 6px 22px rgba(139,92,246,.42)}
+.btn-ghost{color:#d8caff;border:1.5px solid var(--line2);background:var(--card)}
+.btn-full{width:100%}
+.btn[disabled]{opacity:.55;pointer-events:none}
+
+/* ---------- banner saudara ---------- */
+.bros{display:grid;gap:10px;width:100%;margin-top:22px}
+.am-banner{display:flex;align-items:center;gap:13px;
+  background:linear-gradient(92deg,rgba(139,92,246,.16),rgba(217,70,239,.10));
+  border:1px solid var(--line);border-radius:var(--r);padding:13px 15px;
+  box-shadow:var(--glow);transition:transform .18s,box-shadow .18s,border-color .18s}
+.am-banner:hover{transform:translateY(-3px);border-color:rgba(232,121,249,.55)}
+.am-banner:active{transform:scale(.98)}
+.am-banner .ic{flex:none;width:44px;height:44px;border-radius:14px;display:grid;place-items:center;
+  background:linear-gradient(135deg,rgba(139,92,246,.3),rgba(217,70,239,.2));border:1px solid var(--line)}
+.am-banner .tx{min-width:0}
+.am-banner .tx b{font-family:'Titan One',cursive;font-weight:400;font-size:15px;letter-spacing:.6px;display:block;
+  background:linear-gradient(92deg,#d8caff,#f0abfc);-webkit-background-clip:text;background-clip:text;color:transparent}
+.am-banner .tx small{display:block;font-family:'Caveat',cursive;font-size:16px;color:var(--mut);margin-top:1px}
+.am-banner .arrow{flex:none;margin-left:auto;color:#e879f9;transition:transform .18s}
+.am-banner:hover .arrow{transform:translateX(4px)}
+
+/* ---------- section head ---------- */
+.sec-head{display:flex;align-items:center;gap:12px;margin-bottom:14px}
+.sec-head .ic{flex:none;width:42px;height:42px;border-radius:13px;display:grid;place-items:center;
+  background:var(--card2);border:1px solid var(--line)}
+.sec-head h2{font-family:'Titan One',cursive;font-weight:400;font-size:17px;letter-spacing:.7px;
+  background:linear-gradient(92deg,#d8caff,#f0abfc);-webkit-background-clip:text;background-clip:text;color:transparent}
+.sec-head p{font-size:12px;color:var(--mut);margin-top:-2px}
+
+/* ---------- dropzone ---------- */
+.dz{position:relative;text-align:center;border:2px dashed var(--line2);border-radius:20px;
+  background:var(--card);padding:30px 18px;cursor:pointer;transition:border-color .2s,box-shadow .2s,background .2s}
+.dz:hover,.dz.drag{border-color:var(--acc3);background:var(--card2);box-shadow:var(--glow)}
+.dz svg{margin:0 auto 10px}
+.dz .t1{font-weight:700;font-size:14.5px}
+.dz .t2{font-size:12px;color:var(--mut);margin-top:3px}
+.dz.busy{pointer-events:none;opacity:.75}
+.dz input[type=file]{display:none}
+.dz .or{display:inline-block;font-family:'Caveat',cursive;font-size:16px;color:var(--mut);margin-top:9px}
+
+/* ---------- file terpilih ---------- */
+.fsel{display:none;align-items:center;gap:12px;margin-top:12px;border:1px solid var(--line);
+  background:var(--card2);border-radius:var(--r);padding:12px 14px}
+.fsel.on{display:flex}
+.fsel .fx-ic{flex:none;width:42px;height:42px;border-radius:12px;display:grid;place-items:center;
+  font-size:10px;font-weight:800;letter-spacing:.5px;color:#d8caff;
+  background:linear-gradient(135deg,rgba(139,92,246,.35),rgba(217,70,239,.25));border:1px solid var(--line)}
+.fsel .fi{min-width:0;flex:1}
+.fsel .fn{font-weight:600;font-size:13px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.fsel .fs{font-size:11.5px;color:var(--mut)}
+.fsel .del{flex:none;width:34px;height:34px;border-radius:10px;display:grid;place-items:center;
+  border:1px solid var(--line);color:var(--err);background:rgba(248,113,113,.08)}
+
+/* ---------- progress ---------- */
+.prog{display:none;margin-top:12px;border:1px solid var(--line);background:var(--card2);border-radius:var(--r);padding:14px 16px}
+.prog.on{display:block}
+.prog .row{display:flex;justify-content:space-between;font-size:12px;color:var(--mut);margin-bottom:8px}
+.prog .row b{color:#d8caff;letter-spacing:.5px}
+.track{height:10px;border-radius:99px;background:rgba(167,139,250,.15);overflow:hidden}
+.fill{height:100%;width:0;border-radius:99px;background:linear-gradient(90deg,var(--acc),var(--acc3));
+  box-shadow:0 0 12px rgba(192,132,252,.6);transition:width .25s}
+.prog .warn{font-size:11px;color:var(--mut);margin-top:8px;display:flex;align-items:center;gap:6px}
+
+/* ---------- hasil ---------- */
+.res{display:none;margin-top:12px;border:1px solid rgba(52,211,153,.4);border-radius:var(--r);
+  background:rgba(52,211,153,.07);padding:15px 16px;box-shadow:0 0 20px rgba(52,211,153,.12)}
+.res.on{display:block}
+.res .rt{display:flex;align-items:center;gap:8px;font-weight:700;font-size:13.5px;color:var(--ok);margin-bottom:10px}
+.urlbox{display:flex;align-items:center;gap:8px;background:rgba(11,6,20,.6);border:1px solid var(--line);
+  border-radius:12px;padding:11px 13px}
+.urlbox code{flex:1;font-family:ui-monospace,Menlo,Consolas,monospace;font-size:12.5px;color:#d8caff;
+  word-break:break-all;user-select:all}
+.res .acts{display:flex;gap:9px;margin-top:11px}
+.res .acts .btn{flex:1;padding:10px 12px;font-size:12.5px}
+.res .exp{font-size:11.5px;color:var(--mut);margin-top:10px;display:flex;gap:6px;align-items:flex-start}
+
+/* ---------- info tab baru (mode fallback) ---------- */
+.fbnote{display:none;margin-top:12px;border:1px solid rgba(251,191,36,.4);border-radius:var(--r);
+  background:rgba(251,191,36,.07);padding:13px 15px;font-size:12.5px;color:#fde68a}
+.fbnote.on{display:block}
+.fbnote b{color:var(--gold)}
+
+/* ---------- error ---------- */
+.errbox{display:none;margin-top:12px;border:1px solid rgba(248,113,113,.4);border-radius:var(--r);
+  background:rgba(248,113,113,.08);padding:13px 15px;font-size:12.5px;color:#fecaca}
+.errbox.on{display:block}
+.errbox b{color:var(--err)}
+
+/* ---------- riwayat ---------- */
+.hcard{border:1px solid var(--line);background:var(--card);border-radius:var(--r);padding:6px 8px}
+.hitem{display:flex;align-items:center;gap:11px;padding:11px 8px;border-bottom:1px dashed var(--line)}
+.hitem:last-child{border-bottom:0}
+.hitem .fi{min-width:0;flex:1}
+.hitem .fn{font-weight:600;font-size:12.5px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.hitem .fm{font-size:10.5px;color:var(--mut);margin-top:1px}
+.hitem .act{flex:none;width:34px;height:34px;border-radius:10px;display:grid;place-items:center;
+  border:1px solid var(--line);background:var(--card2);color:#d8caff}
+.hitem .act:active{transform:scale(.92)}
+.hclear{margin:10px 4px 4px;font-size:11.5px;font-weight:700;color:var(--err);
+  border:1px solid rgba(248,113,113,.35);border-radius:999px;padding:7px 14px}
+.empty{padding:18px 10px;text-align:center;font-family:'Caveat',cursive;font-size:17px;color:var(--mut)}
+
+/* ---------- cara pakai ---------- */
+.steps{display:grid;gap:11px}
+.step{display:flex;gap:13px;border:1px solid var(--line);background:var(--card);border-radius:var(--r);padding:14px 15px}
+.step .n{flex:none;width:30px;height:30px;border-radius:50%;display:grid;place-items:center;
+  font-family:'Titan One',cursive;font-size:13px;color:#fff;
+  background:linear-gradient(135deg,#8b5cf6,#d946ef);box-shadow:0 0 12px rgba(139,92,246,.45)}
+.step h3{font-size:13.5px;font-weight:700}
+.step p{font-size:12.5px;color:var(--mut);margin-top:2px}
+
+/* ---------- faq ---------- */
+.faq details{border:1px solid var(--line);background:var(--card);border-radius:var(--r);padding:0;overflow:hidden}
+.faq details+details{margin-top:9px}
+.faq summary{list-style:none;cursor:pointer;display:flex;align-items:center;gap:10px;
+  font-weight:600;font-size:13px;padding:13px 15px}
+.faq summary::-webkit-details-marker{display:none}
+.faq summary .pm{flex:none;margin-left:auto;color:var(--acc3);font-size:17px;font-weight:700;transition:transform .2s}
+.faq details[open] .pm{transform:rotate(45deg)}
+.faq .a{padding:0 15px 13px;font-size:12.5px;color:var(--mut)}
+
+/* ---------- footer ---------- */
+footer{position:relative;z-index:5;text-align:center;padding:26px 16px 118px;color:var(--mut);font-size:12px}
+footer .fl{font-family:'Titan One',cursive;font-size:14px;letter-spacing:1px;
+  background:linear-gradient(92deg,#d8caff,#f0abfc);-webkit-background-clip:text;background-clip:text;color:transparent}
+footer .fs2{font-family:'Caveat',cursive;font-size:17px;color:#cdbcf0;margin:5px 0 3px}
+footer a{color:var(--acc2)}
+
+/* ---------- bottom nav ---------- */
+.bn{position:fixed;left:50%;bottom:12px;transform:translateX(-50%);z-index:55;width:min(540px,calc(100% - 24px));
+  display:flex;background:rgba(21,12,38,.9);backdrop-filter:blur(16px);-webkit-backdrop-filter:blur(16px);
+  border:1px solid var(--line);border-radius:24px;padding:9px 6px;box-shadow:var(--shadow)}
+.bn a{flex:1;display:flex;flex-direction:column;align-items:center;gap:3px;font-size:9.5px;font-weight:700;
+  letter-spacing:.4px;color:var(--mut);border-radius:16px;padding:7px 2px;transition:color .2s,background .2s}
+.bn a.on{color:#f0abfc;background:var(--card2);box-shadow:inset 0 0 0 1px var(--line)}
+.bn a:active{transform:scale(.94)}
+
+/* ---------- toast & reveal ---------- */
+.toast{position:fixed;left:50%;bottom:86px;transform:translateX(-50%) translateY(16px);z-index:60;
+  background:rgba(21,12,38,.95);border:1px solid var(--line2);color:#e6dbff;padding:11px 20px;border-radius:999px;
+  font-size:13px;font-weight:600;opacity:0;pointer-events:none;transition:opacity .25s,transform .25s;
+  box-shadow:var(--shadow);white-space:nowrap;max-width:92vw;overflow:hidden;text-overflow:ellipsis}
+.toast.show{opacity:1;transform:translateX(-50%) translateY(0)}
+.rv{opacity:0;transform:translateY(22px);transition:opacity .6s ease,transform .6s ease}
+.rv.in{opacity:1;transform:none}
+@media(prefers-reduced-motion:reduce){
+  .rv{opacity:1;transform:none}
+  *{animation:none!important}
+}
+</style>
+</head>
+<body>
+<!-- ==================== SPLASH ==================== -->
+<div id="splash" aria-hidden="true">
+  <div class="slogo">GETO DROP</div>
+  <div class="ssub">drop file · ambil link · 12 jam</div>
+  <div class="sbar"><i></i></div>
+</div>
+
+<!-- ==================== BACKGROUND ==================== -->
+<div class="blob b1" aria-hidden="true"></div>
+<div class="blob b2" aria-hidden="true"></div>
+<div class="blob b3" aria-hidden="true"></div>
+<div class="grid-bg" aria-hidden="true"></div>
+<canvas id="fx" aria-hidden="true"></canvas>
+
+<!-- ==================== HEADER ==================== -->
+<header class="hdr">
+  <div class="hdr-in">
+    <div class="logo">
+      <svg class="crown" width="22" height="22" viewBox="0 0 24 24" fill="none" aria-hidden="true">
+        <path d="M3 8l4 4 5-6 5 6 4-4v9a1 1 0 0 1-1 1H4a1 1 0 0 1-1-1V8z" fill="#fbbf24" stroke="#fde68a" stroke-width="1"/>
+      </svg>
+      <b>GETO DROP</b>
+    </div>
+    <span class="status"><span class="dot"></span>ONLINE</span>
+    <span class="spacer"></span>
+    <a class="wa-top" id="waTop" data-wa="Halo GETO DROP! Aku butuh bantuan soal upload file 🙏" target="_blank" rel="noopener" aria-label="Chat WhatsApp" style="display:none">
+      <svg width="16" height="16" viewBox="0 0 24 24" fill="currentColor" aria-hidden="true"><path d="M12 2a10 10 0 0 0-8.6 15.1L2 22l5-1.3A10 10 0 1 0 12 2zm0 18.2c-1.5 0-2.9-.4-4.1-1.1l-.3-.2-3 .8.8-2.9-.2-.3A8.2 8.2 0 1 1 12 20.2z"/><path d="M9.5 7.3c-.2-.5-.4-.5-.6-.5h-.5c-.2 0-.5.1-.8.4-.3.3-1 1-1 2.5s1.1 2.9 1.2 3.1c.1.2 2.1 3.3 5.1 4.5 2.5 1 3 .8 3.6.7.5-.1 1.7-.7 1.9-1.4.2-.7.2-1.2.2-1.4-.1-.1-.3-.2-.6-.3l-2-1c-.3-.1-.5-.1-.7.1l-1 1.2c-.2.2-.3.2-.6.1a6.8 6.8 0 0 1-3.4-3c-.2-.4 0-.5.2-.7l.9-1c.2-.2.2-.4.3-.6 0-.2 0-.4-.1-.5l-1-2.2z"/></svg>
+      Chat
+    </a>
+  </div>
+</header>
+
+<div class="wrap">
+<main>
+
+  <!-- ==================== HERO ==================== -->
+  <section class="hero" id="beranda" aria-label="Beranda">
+    <div class="avatar">
+      <svg class="crown-f" width="30" height="30" viewBox="0 0 24 24" fill="none" aria-hidden="true">
+        <path d="M3 8l4 4 5-6 5 6 4-4v9a1 1 0 0 1-1 1H4a1 1 0 0 1-1-1V8z" fill="#fbbf24" stroke="#fde68a" stroke-width="1"/>
+      </svg>
+      <div class="ring"></div>
+      <div class="sil" role="img" aria-label="Foto profil Geto Drop">
+        <svg viewBox="0 0 100 100" aria-hidden="true">
+          <defs>
+            <radialGradient id="avbg" cx="50%" cy="35%" r="80%">
+              <stop offset="0%" stop-color="#3b1d66"/><stop offset="100%" stop-color="#150a26"/>
+            </radialGradient>
+          </defs>
+          <rect width="100" height="100" fill="url(#avbg)"/>
+          <circle cx="50" cy="18" r="6" fill="#0d0817"/>
+          <path d="M18 100c0-34 12-54 32-54s32 20 32 54z" fill="#0d0817"/>
+          <circle cx="50" cy="34" r="14" fill="#0d0817"/>
+          <path d="M40 24.5c2-2.6 5.5-4.3 10-4.3s8 1.7 10 4.3" stroke="#4c2a85" stroke-width="2" fill="none" stroke-linecap="round" opacity=".8"/>
+          <circle cx="64" cy="38" r="2.2" fill="#fbbf24"/>
+        </svg>
+        <img id="fotoProfil" alt="">
+      </div>
+      <span class="dot-on" aria-hidden="true"></span>
+    </div>
+    <h1>GETO DROP</h1>
+    <p class="tag">temporary file host — max 200mb · auto hapus 12 jam</p>
+    <div class="chips" aria-label="Keunggulan">
+      <span class="chip">MAX <b>200MB</b></span>
+      <span class="chip">AUTO <b>12 JAM</b></span>
+      <span class="chip">NO <b>LOGIN</b></span>
+      <span class="chip">BY <b>GETO SUGURU</b></span>
+    </div>
+    <p class="slogan">"drop file-nya, <span>link-nya langsung jadi</span>"</p>
+    <div class="cta">
+      <a class="btn btn-pri" href="#up">
+        <svg width="17" height="17" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M12 17V5"/><path d="M7 10l5-5 5 5"/><path d="M4 21h16"/></svg>
+        Mulai Upload
+      </a>
+      <a class="btn btn-ghost" href="#cara">
+        <svg width="17" height="17" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" aria-hidden="true"><path d="M4 6h16M4 12h16M4 18h10"/></svg>
+        Cara Pakai
+      </a>
+    </div>
+
+    <!-- banner saudara: geto prem & geto store -->
+    <div class="bros">
+      <a class="am-banner rv" href="https://getoam.vercel.app/" target="_blank" rel="noopener" aria-label="Buka GETO PREM">
+        <span class="ic">
+          <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="#f0abfc" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M13 2L3 14h9l-1 8 10-12h-9l1-8z"/></svg>
+        </span>
+        <span class="tx">
+          <b>GETO PREM</b>
+          <small>Netflix · Viu · AM Pro — instan &amp; otomatis</small>
+        </span>
+        <span class="arrow" aria-hidden="true">
+          <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M5 12h14"/><path d="M13 6l6 6-6 6"/></svg>
+        </span>
+      </a>
+      <a class="am-banner rv" href="https://productgeto.vercel.app/" target="_blank" rel="noopener" aria-label="Buka GETO STORE">
+        <span class="ic">
+          <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="#f0abfc" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M6 2l1.5 4h13L19 2H6z"/><path d="M3 6h18l-1.7 12a2 2 0 0 1-2 1.8H6.7a2 2 0 0 1-2-1.8L3 6z"/><path d="M9 10v6M15 10v6"/></svg>
+        </span>
+        <span class="tx">
+          <b>GETO STORE</b>
+          <small>panel · script · suntik · sewa bot</small>
+        </span>
+        <span class="arrow" aria-hidden="true">
+          <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M5 12h14"/><path d="M13 6l6 6-6 6"/></svg>
+        </span>
+      </a>
+      <a class="am-banner rv" href="https://getotikdl.vercel.app/" target="_blank" rel="noopener" aria-label="Buka GETO TDL">
+        <span class="ic">
+          <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="#f0abfc" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M9 18V5l12-2v13"/><circle cx="6" cy="18" r="3"/><circle cx="18" cy="16" r="3"/></svg>
+        </span>
+        <span class="tx">
+          <b>GETO TDL</b>
+          <small>tiktok downloader — no watermark</small>
+        </span>
+        <span class="arrow" aria-hidden="true">
+          <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M5 12h14"/><path d="M13 6l6 6-6 6"/></svg>
+        </span>
+      </a>
+    </div>
+  </section>
+
+  <!-- ==================== UPLOAD ==================== -->
+  <section id="up" aria-label="Upload file">
+    <div class="sec-head rv">
+      <div class="ic">
+        <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="#d8caff" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M20 17a4 4 0 0 0-1.9-7.5A6.5 6.5 0 0 0 5.2 8.3 4.5 4.5 0 0 0 6 17"/><path d="M12 12v8"/><path d="M8.5 15.5L12 12l3.5 3.5"/></svg>
+      </div>
+      <div>
+        <h2>DROP FILE LU</h2>
+        <p>max 200mb · link hidup 12 jam · nama file 6 char</p>
+      </div>
+    </div>
+
+    <div class="dz rv" id="dz" role="button" tabindex="0" aria-label="Pilih atau drop file">
+      <svg width="44" height="44" viewBox="0 0 24 24" fill="none" stroke="#a78bfa" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M20 17a4 4 0 0 0-1.9-7.5A6.5 6.5 0 0 0 5.2 8.3 4.5 4.5 0 0 0 6 17"/><path d="M12 12v8"/><path d="M8.5 15.5L12 12l3.5 3.5"/></svg>
+      <div class="t1">Tap buat pilih file, atau drop di sini</div>
+      <div class="t2">apa aja boleh — video, zip, apk, foto, doc …</div>
+      <span class="or">mentok 200mb ya 🙏</span>
+      <input type="file" id="fin" aria-hidden="true">
+    </div>
+
+    <div class="fsel" id="fsel">
+      <div class="fx-ic" id="fext">FILE</div>
+      <div class="fi">
+        <div class="fn" id="fname">-</div>
+        <div class="fs" id="fsize">-</div>
+      </div>
+      <button class="del" id="fdel" aria-label="Buang file">
+        <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" aria-hidden="true"><path d="M18 6L6 18M6 6l12 12"/></svg>
+      </button>
+    </div>
+
+    <button class="btn btn-pri btn-full rv" id="btnUp" style="margin-top:12px" disabled>
+      <svg width="17" height="17" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M12 17V5"/><path d="M7 10l5-5 5 5"/><path d="M4 21h16"/></svg>
+      Upload Sekarang
+    </button>
+
+    <div class="prog" id="prog">
+      <div class="row"><b id="plabel">MENGUPLOAD…</b><b id="ppct">0%</b></div>
+      <div class="track"><div class="fill" id="pfill"></div></div>
+      <div class="warn">
+        <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="#fbbf24" stroke-width="2" stroke-linecap="round" aria-hidden="true"><circle cx="12" cy="12" r="9"/><path d="M12 8v5"/><path d="M12 16h.01"/></svg>
+        jangan tutup / ganti tab halaman ini sampai selesai ya
+      </div>
+    </div>
+
+    <div class="res" id="res">
+      <div class="rt">
+        <svg width="17" height="17" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M20 6L9 17l-5-5"/></svg>
+        LINK SI DROPPED! 🔥
+      </div>
+      <div class="urlbox"><code id="rurl">-</code></div>
+      <div class="acts">
+        <button class="btn btn-pri" id="rcopy">COPY LINK</button>
+        <a class="btn btn-ghost" id="ropen" target="_blank" rel="noopener">BUKA FILE</a>
+      </div>
+      <div class="exp">
+        <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="#bcaada" stroke-width="2" stroke-linecap="round" aria-hidden="true" style="flex:none;margin-top:2px"><circle cx="12" cy="12" r="9"/><path d="M12 7v5l3 2"/></svg>
+        <span>file ini <b>otomatis terhapus dalam 12 jam</b>. Temen yang mau ambil nggak perlu login apa apa.</span>
+      </div>
+    </div>
+
+    <div class="fbnote" id="fbnote">
+      <b>Mode tab baru aktif.</b> Upload tetap jalan, tapi link hasilnya kebuka di tab baru — copy manual dari sana ya. Ini karena browser ngeblokir pembacaan balasan server-nya.
+    </div>
+
+    <div class="errbox" id="errbox"></div>
+  </section>
+
+  <!-- ==================== RIWAYAT ==================== -->
+  <section id="hist" aria-label="Riwayat upload">
+    <div class="sec-head rv">
+      <div class="ic">
+        <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="#d8caff" stroke-width="1.8" stroke-linecap="round" aria-hidden="true"><circle cx="12" cy="12" r="9"/><path d="M12 7v5l3 2"/></svg>
+      </div>
+      <div>
+        <h2>RIWAYAT DROP</h2>
+        <p>tersimpan di device lu doang (bukan server)</p>
+      </div>
+    </div>
+    <div class="hcard rv" id="hbox"></div>
+  </section>
+
+  <!-- ==================== CARA PAKAI ==================== -->
+  <section id="cara" aria-label="Cara pakai">
+    <div class="sec-head rv">
+      <div class="ic">
+        <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="#d8caff" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M9 18h6"/><path d="M10 21h4"/><path d="M12 3a6 6 0 0 0-3.5 10.9c.7.5 1 1.3 1 2.1h5c0-.8.3-1.6 1-2.1A6 6 0 0 0 12 3z"/></svg>
+      </div>
+      <div>
+        <h2>CARA PAKAI</h2>
+        <p>tiga langkah, no ribet</p>
+      </div>
+    </div>
+    <div class="steps">
+      <div class="step rv"><span class="n">1</span><div><h3>Pilih / drop file</h3><p>Tap kotaknya, pilih file dari galeri atau file manager. Mentok 200MB.</p></div></div>
+      <div class="step rv"><span class="n">2</span><div><h3>Klik Upload Sekarang</h3><p>Progres bar jalan sendiri. File gede = butuh waktu + koneksi stabil, sabar dikit.</p></div></div>
+      <div class="step rv"><span class="n">3</span><div><h3>Copy link, sebar!</h3><p>Link langsung jadi. Kirim ke temen / grup / customer. 12 jam kemudian file-nya ngilang sendiri.</p></div></div>
+    </div>
+  </section>
+
+  <!-- ==================== FAQ ==================== -->
+  <section id="faq" class="faq" aria-label="FAQ">
+    <div class="sec-head rv">
+      <div class="ic">
+        <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="#d8caff" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><circle cx="12" cy="12" r="9"/><path d="M9.5 9a2.5 2.5 0 0 1 4.9.8c0 1.6-2.4 2-2.4 3.2"/><path d="M12 17h.01"/></svg>
+      </div>
+      <div>
+        <h2>FAQ</h2>
+        <p>yang paling sering ditanya</p>
+      </div>
+    </div>
+    <details class="rv">
+      <summary>File-nya disimpen di mana? <span class="pm">+</span></summary>
+      <div class="a">Di server litterbox (layanan file host temporer). Web ini cuma jembatan — file lu nggak nginep di server kami, langsung ngalir dari device lu ke sana.</div>
+    </details>
+    <details class="rv">
+      <summary>Kok cuma 12 jam? <span class="pm">+</span></summary>
+      <div class="a">Emang konsepnya file sementara — buat kirim-kiriman cepat, bukan nyimpen selamanya. Kalo butuh simpan lama, download lagi sebelum 12 jam habis.</div>
+    </details>
+    <details class="rv">
+      <summary>Kadang link kebuka di tab baru, kenapa? <span class="pm">+</span></summary>
+      <div class="a">Itu mode cadangan. Beberapa browser/settingan ngeblokir web buat baca balasan server file host-nya, jadi link-nya kami lempar ke tab baru buat lu copy manual. Hasilnya sama aja.</div>
+    </details>
+    <details class="rv">
+      <summary>Ada batasan jenis file? <span class="pm">+</span></summary>
+      <div class="a">Nggak ada — video, zip, apk, mp3, foto, doc, semua bisa. Yang penting max 200MB per file. Konten ilegal ya jangan, we share the burden 😌.</div>
+    </details>
+  </section>
+
+</main>
+</div>
+
+<!-- ==================== FOOTER ==================== -->
+<footer>
+  <div class="fl">GETO DROP</div>
+  <div class="fs2">good drop, good share ✦ geto drop</div>
+  <div>WA: <a id="waNum" href="#" target="_blank" rel="noopener">-</a> · © <span id="yr">2025</span> GETO SUGURU</div>
+  <div style="margin-top:6px">digerakkan litterbox.catbox.moe — file otomatis terhapus 12 jam</div>
+</footer>
+
+<!-- ==================== BOTTOM NAV ==================== -->
+<nav class="bn" aria-label="Menu bawah">
+  <a href="#beranda" data-sec="beranda" class="on">
+    <svg width="19" height="19" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M3 10.5L12 3l9 7.5"/><path d="M5 9.5V21h14V9.5"/></svg>
+    Beranda</a>
+  <a href="#up" data-sec="up">
+    <svg width="19" height="19" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M20 17a4 4 0 0 0-1.9-7.5A6.5 6.5 0 0 0 5.2 8.3 4.5 4.5 0 0 0 6 17"/><path d="M12 12v8"/><path d="M8.5 15.5L12 12l3.5 3.5"/></svg>
+    Upload</a>
+  <a href="#hist" data-sec="hist">
+    <svg width="19" height="19" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" aria-hidden="true"><circle cx="12" cy="12" r="9"/><path d="M12 7v5l3 2"/></svg>
+    Riwayat</a>
+  <a href="#cara" data-sec="cara">
+    <svg width="19" height="19" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M9 18h6"/><path d="M10 21h4"/><path d="M12 3a6 6 0 0 0-3.5 10.9c.7.5 1 1.3 1 2.1h5c0-.8.3-1.6 1-2.1A6 6 0 0 0 12 3z"/></svg>
+    Cara</a>
+  <a href="#faq" data-sec="faq">
+    <svg width="19" height="19" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><circle cx="12" cy="12" r="9"/><path d="M9.5 9a2.5 2.5 0 0 1 4.9.8c0 1.6-2.4 2-2.4 3.2"/><path d="M12 17h.01"/></svg>
+    FAQ</a>
+</nav>
+
+<div class="toast" id="toast" role="status" aria-live="polite"></div>
+
+<script type="module">
+/* ============================================================
+   ⭐ CONFIG — EDIT DI SINI
+   ============================================================ */
+const WA_NUMBER  = "6288312700512"                        // nomor WA owner (tanpa +). Kosong = tombol WA hilang otomatis
+const WA_DISPLAY = "+62 883-1270-0512"                    // tampilan nomor di footer
+const FOTO_PROFIL = "https://files.catbox.moe/r51gq7.jpg" // foto avatar hero (sama sama keluarga GETO)
+const MAX_MB      = 200                                   // batas ukuran file (MB) — lebih dari ini ditolak
+const EXP_TIME    = "12h"                                 // expired: 1h / 12h / 24h / 72h (pilihan litterbox)
+const NAME_LEN    = "6"                                   // panjang nama file acak: 6 / 16 char
+/* ================== BATAS CONFIG ========================== */
+
+const API = "https://litterbox.catbox.moe/resources/internals/api.php"
+const K_HIST = "gdrop_hist", K_CORS = "gdrop_cors"
+
+const $  = (s) => document.querySelector(s)
+const $$ = (s) => [...document.querySelectorAll(s)]
+const esc = (s) => String(s ?? "").replace(/&/g,"&amp;").replace(/</g,"&lt;").replace(/>/g,"&gt;").replace(/"/g,"&quot;")
+const fmtSize = (b) => b < 1024 ? b + " B" : b < 1048576 ? (b/1024).toFixed(1) + " KB" : b < 1073741824 ? (b/1048576).toFixed(1) + " MB" : (b/1073741824).toFixed(2) + " GB"
+
+let toastT
+function toast(msg) {
+  const t = $("#toast")
+  t.textContent = msg
+  t.classList.add("show")
+  clearTimeout(toastT)
+  toastT = setTimeout(() => t.classList.remove("show"), 2600)
+}
+
+async function copyText(txt) {
+  try {
+    await navigator.clipboard.writeText(txt)
+    toast("Dicopy ✓")
+  } catch {
+    const ta = document.createElement("textarea")
+    ta.value = txt; document.body.appendChild(ta); ta.select()
+    try { document.execCommand("copy"); toast("Dicopy ✓") } catch { toast("Ga bisa copy, coba manual ya") }
+    ta.remove()
+  }
+}
+
+/* ---------- WA link + foto profil + tahun ---------- */
+if (WA_NUMBER) {
+  $$("[data-wa]").forEach((a) => {
+    a.style.display = ""
+    a.href = "https://wa.me/" + WA_NUMBER + "?text=" + encodeURIComponent(a.getAttribute("data-wa"))
+  })
+  const wn = $("#waNum")
+  wn.textContent = WA_DISPLAY
+  wn.href = "https://wa.me/" + WA_NUMBER
+}
+const fp = $("#fotoProfil")
+if (FOTO_PROFIL) {
+  fp.src = FOTO_PROFIL
+  fp.addEventListener("error", () => fp.remove())
+} else fp.remove()
+$("#yr").textContent = new Date().getFullYear()
+
+/* ---------- splash ---------- */
+addEventListener("load", () => setTimeout(() => $("#splash").classList.add("off"), 800))
+setTimeout(() => $("#splash").classList.add("off"), 2600)
+
+/* ---------- reveal on scroll ---------- */
+const io = new IntersectionObserver((es) => {
+  es.forEach((x) => { if (x.isIntersecting) { x.target.classList.add("in"); io.unobserve(x.target) } })
+}, { threshold: .1 })
+$$(".rv").forEach((el) => io.observe(el))
+
+/* ---------- bottom nav: scrollspy ---------- */
+const navLinks = $$(".bn a")
+const secs = navLinks.map((l) => $("#" + l.getAttribute("data-sec"))).filter(Boolean)
+const setActive = (id) => navLinks.forEach((l) => l.classList.toggle("on", l.getAttribute("data-sec") === id))
+const ioNav = new IntersectionObserver((es) => {
+  es.forEach((x) => { if (x.isIntersecting) setActive(x.target.id) })
+}, { rootMargin: "-38% 0px -55% 0px" })
+secs.forEach((s) => ioNav.observe(s))
+
+/* ---------- partikel cursed energy ---------- */
+;(function particles() {
+  const cv = $("#fx"), ctx = cv.getContext("2d")
+  let W, H, ps = []
+  const N = Math.min(40, Math.floor(window.innerWidth / 14))
+  function size() {
+    W = cv.width = window.innerWidth * devicePixelRatio
+    H = cv.height = window.innerHeight * devicePixelRatio
+    cv.style.width = window.innerWidth + "px"
+    cv.style.height = window.innerHeight + "px"
+  }
+  function mk() {
+    const hues = [262, 275, 288, 300]
+    return {
+      x: Math.random() * W, y: H + Math.random() * H * .3,
+      r: (Math.random() * 2.2 + .7) * devicePixelRatio,
+      v: (Math.random() * .3 + .1) * devicePixelRatio,
+      sw: Math.random() * Math.PI * 2,
+      hue: hues[Math.floor(Math.random() * hues.length)],
+      a: Math.random() * .45 + .15
+    }
+  }
+  function loop() {
+    ctx.clearRect(0, 0, W, H)
+    for (const p of ps) {
+      p.y -= p.v; p.sw += .014
+      p.x += Math.sin(p.sw) * .3 * devicePixelRatio
+      if (p.y < -12) Object.assign(p, mk(), { y: H + 12 })
+      const g = ctx.createRadialGradient(p.x, p.y, 0, p.x, p.y, p.r * 3.2)
+      g.addColorStop(0, "hsla(" + p.hue + ",92%,78%," + p.a + ")")
+      g.addColorStop(1, "hsla(" + p.hue + ",92%,70%,0)")
+      ctx.fillStyle = g
+      ctx.beginPath(); ctx.arc(p.x, p.y, p.r * 3.2, 0, Math.PI * 2); ctx.fill()
+    }
+    requestAnimationFrame(loop)
+  }
+  window.addEventListener("resize", () => { size(); ps = Array.from({ length: N }, mk) })
+  size(); ps = Array.from({ length: N }, mk); loop()
+})()
+
+/* ============================================================
+   MESIN UPLOAD — browser lu → langsung ke litterbox
+   (tanpa perantira server, biar 200mb lancar & bandwith aman)
+   ============================================================ */
+const dz = $("#dz"), fin = $("#fin"), btnUp = $("#btnUp")
+const prog = $("#prog"), pfill = $("#pfill"), ppct = $("#ppct"), plabel = $("#plabel")
+const res = $("#res"), rurl = $("#rurl"), ropen = $("#ropen")
+const errbox = $("#errbox"), fbnote = $("#fbnote")
+let curFile = null, busy = false
+
+function showErr(html) { errbox.innerHTML = html; errbox.classList.add("on") }
+function hideErr() { errbox.classList.remove("on") }
+function setPct(p) {
+  const v = Math.min(100, Math.round(p * 100))
+  pfill.style.width = v + "%"
+  ppct.textContent = v + "%"
+}
+function extOf(n) {
+  const m = String(n).match(/\.([a-z0-9]{1,5})$/i)
+  return m ? m[1].toUpperCase() : "FILE"
+}
+
+/* pilih file */
+function pick(f) {
+  if (busy) return
+  hideErr(); res.classList.remove("on"); fbnote.classList.remove("on")
+  if (!f) return
+  if (f.size === 0) { toast("File nya kosong woy 😅"); return }
+  if (f.size > MAX_MB * 1048576) {
+    showErr("<b>Ditolak 🚫</b> — file lu <b>" + esc(fmtSize(f.size)) + "</b>, mentok nya <b>" + MAX_MB + " MB</b>. Compress dulu atau potong ya.")
+    toast("Kelebihan size, ditolak")
+    return
+  }
+  curFile = f
+  $("#fext").textContent = extOf(f.name)
+  $("#fname").textContent = f.name
+  $("#fsize").textContent = fmtSize(f.size) + " · siap di-drop"
+  $("#fsel").classList.add("on")
+  btnUp.disabled = false
+}
+
+/* buang file terpilih */
+$("#fdel").addEventListener("click", () => {
+  curFile = null
+  $("#fsel").classList.remove("on")
+  fin.value = ""
+  btnUp.disabled = true
+})
+
+/* event dropzone */
+dz.addEventListener("click", () => { if (!busy) fin.click() })
+dz.addEventListener("keydown", (e) => { if (e.key === "Enter" || e.key === " ") { e.preventDefault(); if (!busy) fin.click() } })
+fin.addEventListener("change", () => pick(fin.files[0]))
+;["dragenter", "dragover"].forEach((ev) => dz.addEventListener(ev, (e) => { e.preventDefault(); dz.classList.add("drag") }))
+;["dragleave", "drop"].forEach((ev) => dz.addEventListener(ev, (e) => { e.preventDefault(); dz.classList.remove("drag") }))
+dz.addEventListener("drop", (e) => { if (!busy && e.dataTransfer.files.length) pick(e.dataTransfer.files[0]) })
+
+/* ---------- probe CORS: cek apakah balasan litterbox kebaca browser ---------- */
+async function probeCORS() {
+  const cached = localStorage.getItem(K_CORS)
+  if (cached === "ok" || cached === "fb") return cached
+  try {
+    const fd = new FormData()
+    fd.append("reqtype", "fileupload")
+    fd.append("time", "1h")
+    fd.append("fileNameLength", "6")
+    fd.append("fileToUpload", new Blob(["g"], { type: "text/plain" }), "g.txt")
+    const r = await fetch(API, { method: "POST", body: fd })
+    const t = (await r.text()).trim()
+    const ok = /^https?:\/\//i.test(t)
+    localStorage.setItem(K_CORS, ok ? "ok" : "fb")
+    return ok ? "ok" : "fb"
+  } catch {
+    localStorage.setItem(K_CORS, "fb")
+    return "fb"
+  }
+}
+
+/* ---------- upload utama (XHR, ada progres) ---------- */
+function uploadXHR(file) {
+  return new Promise((resolve, reject) => {
+    const fd = new FormData()
+    fd.append("reqtype", "fileupload")
+    fd.append("time", EXP_TIME)
+    fd.append("fileNameLength", NAME_LEN)
+    fd.append("fileToUpload", file, file.name)
+    const xhr = new XMLHttpRequest()
+    xhr.open("POST", API)
+    xhr.upload.onprogress = (e) => { if (e.lengthComputable) setPct(e.loaded / e.total) }
+    xhr.onload = () => {
+      const t = String(xhr.responseText || "").trim()
+      if (xhr.status === 200 && /^https?:\/\//i.test(t)) resolve(t)
+      else reject(new Error(t ? t.slice(0, 160) : "HTTP " + xhr.status))
+    }
+    xhr.onerror = () => reject(new Error("koneksi ke server file kepotong"))
+    xhr.send(fd)
+  })
+}
+
+/* ---------- plan B: form POST, link kebuka di tab baru ---------- */
+function uploadPlanB(file) {
+  const f = document.createElement("form")
+  f.action = API; f.method = "POST"; f.enctype = "multipart/form-data"; f.target = "_blank"
+  ;[["reqtype", "fileupload"], ["time", EXP_TIME], ["fileNameLength", NAME_LEN]].forEach(([k, v]) => {
+    const i = document.createElement("input"); i.type = "hidden"; i.name = k; i.value = v; f.appendChild(i)
+  })
+  const dt = new DataTransfer(); dt.items.add(file)
+  const fi = document.createElement("input"); fi.type = "file"; fi.name = "fileToUpload"; fi.files = dt.files
+  f.appendChild(fi)
+  document.body.appendChild(f); f.submit(); f.remove()
+}
+
+/* ---------- tombol upload ---------- */
+btnUp.addEventListener("click", async () => {
+  if (busy || !curFile) return
+  busy = true
+  hideErr(); res.classList.remove("on"); fbnote.classList.remove("on")
+  btnUp.disabled = true
+  dz.classList.add("busy")
+  $("#fsel").classList.remove("on")
+  prog.classList.add("on")
+  plabel.textContent = "MENGUPLOAD…"
+  setPct(0)
+
+  try {
+    const mode = await probeCORS()
+    if (mode === "fb") {
+      /* jalur cadangan tanpa CORS */
+      setPct(.99)
+      plabel.textContent = "NGUPLOAD… (CEK TAB BARU)"
+      uploadPlanB(curFile)
+      fbnote.classList.add("on")
+      toast("Upload jalan — link nya kebuka di tab baru ya!")
+      addHist({ u: "(buka tab baru buat liat link)", n: curFile.name, s: curFile.size, t: Date.now(), fb: true })
+      done()
+    } else {
+      plabel.textContent = "MENGUPLOAD…"
+      const url = await uploadXHR(curFile)
+      setPct(1)
+      sukses(url, curFile)
+      done()
+    }
+  } catch (e) {
+    showErr("<b>Upload gagal 😵</b> — " + esc(e.message || "koneksi bermasalah") + ". Cek koneksi lalu coba lagi.")
+    toast("Upload gagal, coba lagi")
+    done(true)
+  }
+})
+
+function done(fail) {
+  busy = false
+  prog.classList.remove("on")
+  dz.classList.remove("busy")
+  btnUp.disabled = fail ? !curFile : true
+  if (!fail) {
+    curFile = null
+    fin.value = ""
+    $("#fsel").classList.remove("on")
+    plabel.textContent = "MENGUPLOAD…"
+  }
+}
+
+function sukses(url, f) {
+  rurl.textContent = url
+  ropen.href = url
+  res.classList.add("on")
+  toast("Link jadi! 🔥")
+  addHist({ u: url, n: f.name, s: f.size, t: Date.now() })
+}
+
+/* ---------- riwayat (localStorage, max 8) ---------- */
+const getHist = () => { try { return JSON.parse(localStorage.getItem(K_HIST)) || [] } catch { return [] } }
+function addHist(item) {
+  const h = [item, ...getHist().filter((x) => x && x.u !== item.u)].slice(0, 8)
+  try { localStorage.setItem(K_HIST, JSON.stringify(h)) } catch {}
+  renderHist()
+}
+function renderHist() {
+  const h = getHist(), box = $("#hbox")
+  if (!h.length) {
+    box.innerHTML = '<div class="empty">Belum ada drop — nanti link nya nongol di sini ✍️</div>'
+    return
+  }
+  box.innerHTML = ""
+  h.forEach((it) => {
+    const d = new Date(it.t || Date.now())
+    const meta = fmtSize(it.s || 0) + " · " +
+      String(d.getHours()).padStart(2, "0") + ":" + String(d.getMinutes()).padStart(2, "0") + " · " +
+      String(d.getDate()).padStart(2, "0") + "/" + String(d.getMonth() + 1).padStart(2, "0")
+    const row = document.createElement("div")
+    row.className = "hitem"
+    row.innerHTML =
+      '<div class="fi"><div class="fn">' + esc(it.n || "(tanpa nama)") + '</div><div class="fm">' + esc(meta) + '</div></div>' +
+      '<button class="act a-copy" aria-label="Copy link"><svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="9" y="9" width="12" height="12" rx="2"/><path d="M5 15V5a2 2 0 0 1 2-2h10"/></svg></button>' +
+      '<a class="act" target="_blank" rel="noopener" href="' + esc(it.fb ? "#" : it.u) + '" aria-label="Buka"><svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M18 13v6a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h6"/><path d="M15 3h6v6"/><path d="M10 14L21 3"/></svg></a>'
+    row.querySelector(".a-copy").addEventListener("click", () => {
+      if (it.fb) { toast("Yang ini lewat tab baru, copy dari sana ya") ; return }
+      copyText(it.u)
+    })
+    box.appendChild(row)
+  })
+  const clr = document.createElement("button")
+  clr.className = "hclear"
+  clr.textContent = "HAPUS RIWAYAT"
+  clr.addEventListener("click", () => {
+    try { localStorage.removeItem(K_HIST) } catch {}
+    renderHist(); toast("Riwayat kebuang 🗑️")
+  })
+  box.appendChild(clr)
+}
+renderHist()
+
+/* ---------- jaga-jaga: jangan ninggalin halaman pas lagi upload ---------- */
+addEventListener("beforeunload", (e) => {
+  if (busy) { e.preventDefault(); e.returnValue = "" }
+})
+</script>
+
+
+</body>
+</html>
